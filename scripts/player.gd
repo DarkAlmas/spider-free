@@ -7,6 +7,9 @@ const GRAV := 22.0
 const WEB_RANGE := 120.0
 const ROPE_K := 120.0      # spring stiffness per metre of stretch
 const ROPE_DAMP := 14.0    # damper on radial (outward) speed
+const PIVOT_OFS := Vector3(0, 1.2, 0)
+const CAM_LAG_SWING := 6.0   # lower = more lag while swinging
+const CAM_LAG_GROUND := 20.0
 const ROPE_SLOP := 0.5     # max stretch before soft position correction
 @onready var pivot: Node3D = $Pivot
 @onready var cam: Camera3D = $Pivot/SpringArm3D/Camera3D
@@ -22,6 +25,8 @@ var stamina := 100.0
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	rope.top_level = true
+	pivot.top_level = true  # camera follows with lag
+	pivot.global_position = global_position + PIVOT_OFS
 
 func _unhandled_input(ev):
 	if ev is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
@@ -50,7 +55,7 @@ func release_web():
 	attached = false  # keep current velocity
 
 func _physics_process(dt):
-	pivot.rotation = Vector3(pitch, yaw, 0)
+	pivot.global_rotation = Vector3(pitch, yaw, 0)
 	var inp := Input.get_vector("ui_left","ui_right","ui_up","ui_down")
 	var k := Vector2(float(Input.is_key_pressed(KEY_D)) - float(Input.is_key_pressed(KEY_A)), float(Input.is_key_pressed(KEY_S)) - float(Input.is_key_pressed(KEY_W)))
 	if k != Vector2.ZERO: inp = k.normalized()
@@ -70,7 +75,7 @@ func _physics_process(dt):
 			var n := d / dist  # anchor->player unit; tension acts along -n only
 			var stretch := dist - rope_len
 			var radial := velocity.dot(n)  # >0 = moving away from anchor
-			var t := ROPE_K * stretch + ROPE_DAMP * max(radial, 0.0)
+			var t: float = ROPE_K * stretch + ROPE_DAMP * max(radial, 0.0)
 			velocity -= n * max(t, 0.0) * dt  # rope pulls, never pushes
 			if stretch > ROPE_SLOP:  # soft correction for stability only
 				global_position -= n * (stretch - ROPE_SLOP) * 0.5
@@ -80,6 +85,8 @@ func _physics_process(dt):
 	stamina = clamp(stamina + (-20.0 if running else 15.0) * dt, 0.0, 100.0)
 	move_and_slide()
 	if global_position.y < -30: global_position = Vector3(0, 2, 0); velocity = Vector3.ZERO
+	var lag := CAM_LAG_SWING if attached else CAM_LAG_GROUND
+	pivot.global_position = pivot.global_position.lerp(global_position + PIVOT_OFS, clamp(lag * dt, 0.0, 1.0))
 	_draw_rope()
 
 func _draw_rope():
