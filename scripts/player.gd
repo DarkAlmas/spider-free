@@ -1,10 +1,13 @@
 extends CharacterBody3D
-# Original hero "Нить" — walk/run/jump + rope swing (custom spring).
+# Original hero "Нить" — walk/run/jump + pendulum/cable web: fixed length, spring+damper when taut, slack otherwise.
 const WALK := 7.0
 const RUN := 13.0
 const JUMP := 9.0
 const GRAV := 22.0
 const WEB_RANGE := 120.0
+const ROPE_K := 120.0      # spring stiffness per metre of stretch
+const ROPE_DAMP := 14.0    # damper on radial (outward) speed
+const ROPE_SLOP := 0.5     # max stretch before soft position correction
 @onready var pivot: Node3D = $Pivot
 @onready var cam: Camera3D = $Pivot/SpringArm3D/Camera3D
 @onready var rope: MeshInstance3D = $Rope
@@ -41,11 +44,10 @@ func shoot_web():
 	var hit := get_world_3d().direct_space_state.intersect_ray(q)
 	if hit:
 		attached = true; anchor = hit.position; stamina -= 10
-		rope_len = max(global_position.distance_to(anchor) * 0.9, 3.0)
+		rope_len = max(global_position.distance_to(anchor), 3.0)  # fixed at hit; velocity untouched
 
 func release_web():
-	if attached: velocity += Vector3.UP * 4.0
-	attached = false
+	attached = false  # keep current velocity
 
 func _physics_process(dt):
 	pivot.rotation = Vector3(pitch, yaw, 0)
@@ -64,12 +66,15 @@ func _physics_process(dt):
 	if attached:
 		var d := global_position - anchor
 		var dist := d.length()
-		if dist > rope_len:
-			var n := d / dist
-			global_position = anchor + n * rope_len  # rope constraint
-			var radial := velocity.dot(n)
-			if radial > 0: velocity -= n * radial
-			velocity += -n * (dist - rope_len) * 30.0 * dt
+		if dist > rope_len and dist > 0.001:
+			var n := d / dist  # anchor->player unit; tension acts along -n only
+			var stretch := dist - rope_len
+			var radial := velocity.dot(n)  # >0 = moving away from anchor
+			var t := ROPE_K * stretch + ROPE_DAMP * max(radial, 0.0)
+			velocity -= n * max(t, 0.0) * dt  # rope pulls, never pushes
+			if stretch > ROPE_SLOP:  # soft correction for stability only
+				global_position -= n * (stretch - ROPE_SLOP) * 0.5
+		# dist <= rope_len: slack, no rope force
 		if Input.is_key_pressed(KEY_SPACE): rope_len = max(rope_len - 15 * dt, 3.0)  # reel in
 	var running := Input.is_key_pressed(KEY_SHIFT) and is_on_floor() and inp != Vector2.ZERO
 	stamina = clamp(stamina + (-20.0 if running else 15.0) * dt, 0.0, 100.0)
