@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="280" viewBox="0 0 640 280">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1A1240"/><stop offset="55%" stop-color="#3B1F66"/><stop offset="100%" stop-color="#0F4A52"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="280" fill="url(#sky)"/>
+  <circle cx="540" cy="70" r="36" fill="#D9FFF8" opacity="0.9"/>
+  <!-- low-poly skyline readable at distance -->
+  <g fill="#0A0B17">
+    <rect x="20" y="160" width="50" height="120"/><rect x="78" y="100" width="60" height="180"/>
+    <rect x="146" y="130" width="44" height="150"/><rect x="198" y="70" width="70" height="210"/>
+    <rect x="276" y="150" width="48" height="130"/><rect x="332" y="90" width="64" height="190"/>
+    <rect x="404" y="120" width="52" height="160"/><rect x="464" y="60" width="80" height="220"/>
+    <rect x="552" y="140" width="56" height="140"/>
+  </g>
+  <path d="M40 200 Q200 40 380 160" fill="none" stroke="#5FF2DF" stroke-width="2" opacity="0.7"/>
+  <text x="24" y="28" fill="#E6F7F5" font-family="system-ui" font-size="14" font-weight="700">Нить — low-poly квартал v0</text>
+</svg>

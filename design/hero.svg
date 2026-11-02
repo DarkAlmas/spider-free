@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="360" viewBox="0 0 200 360">
+  <rect width="200" height="360" fill="#0B0D14"/>
+  <text x="100" y="28" text-anchor="middle" fill="#8A93A8" font-family="system-ui" font-size="12">Нить — силуэт v0</text>
+  <!-- geometric original suit: teal + violet, NOT red/blue Spidey -->
+  <polygon points="100,50 145,85 130,155 70,155 55,85" fill="#14B8A6"/>
+  <rect x="85" y="72" width="30" height="6" rx="2" fill="#E6FFFB"/>
+  <polygon points="40,155 160,155 140,320 60,320" fill="url(#suit)"/>
+  <defs>
+    <linearGradient id="suit" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="50%" stop-color="#7C3AED"/><stop offset="50%" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+  <text x="100" y="350" text-anchor="middle" fill="#5FF2DF" font-family="system-ui" font-size="11">оригинал · без Marvel IP</text>
+</svg>
