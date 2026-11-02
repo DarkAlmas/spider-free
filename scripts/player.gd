@@ -13,6 +13,8 @@ var pitch := -0.2
 var attached := false
 var anchor := Vector3.ZERO
 var rope_len := 0.0
+var hp := 100.0
+var stamina := 100.0
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -32,12 +34,13 @@ func _unhandled_input(ev):
 		global_position = Vector3(0, 2, 0); velocity = Vector3.ZERO; release_web()
 
 func shoot_web():
+	if stamina < 10: return
 	var from := cam.global_position
 	var to := from - cam.global_transform.basis.z * WEB_RANGE
 	var q := PhysicsRayQueryParameters3D.create(from, to); q.exclude = [get_rid()]
 	var hit := get_world_3d().direct_space_state.intersect_ray(q)
 	if hit:
-		attached = true; anchor = hit.position
+		attached = true; anchor = hit.position; stamina -= 10
 		rope_len = max(global_position.distance_to(anchor) * 0.9, 3.0)
 
 func release_web():
@@ -68,6 +71,8 @@ func _physics_process(dt):
 			if radial > 0: velocity -= n * radial
 			velocity += -n * (dist - rope_len) * 30.0 * dt
 		if Input.is_key_pressed(KEY_SPACE): rope_len = max(rope_len - 15 * dt, 3.0)  # reel in
+	var running := Input.is_key_pressed(KEY_SHIFT) and is_on_floor() and inp != Vector2.ZERO
+	stamina = clamp(stamina + (-20.0 if running else 15.0) * dt, 0.0, 100.0)
 	move_and_slide()
 	if global_position.y < -30: global_position = Vector3(0, 2, 0); velocity = Vector3.ZERO
 	_draw_rope()

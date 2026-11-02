@@ -1,14 +1,22 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player.gd" id="2"]
 
 [sub_resource type="CapsuleShape3D" id="c1"]
 [sub_resource type="StandardMaterial3D" id="mat1"]
-albedo_color = Color(0.1, 0.6, 0.55, 1)
+albedo_color = Color(0.0784, 0.7216, 0.651, 1)
+emission_enabled = true
+emission = Color(0.4863, 0.2275, 0.9294, 1)
+emission_energy_multiplier = 0.4
 [sub_resource type="CapsuleMesh" id="m1"]
 material = SubResource("mat1")
+[sub_resource type="StandardMaterial3D" id="ropemat"]
+albedo_color = Color(0.3725, 0.949, 0.8745, 1)
+emission_enabled = true
+emission = Color(0.3725, 0.949, 0.8745, 1)
 [sub_resource type="CylinderMesh" id="r1"]
+material = SubResource("ropemat")
 top_radius = 0.04
 bottom_radius = 0.04
 height = 1.0
@@ -40,7 +48,3 @@ spring_length = 6.0
 [node name="Rope" type="MeshInstance3D" parent="Player"]
 mesh = SubResource("r1")
 
-[node name="Hint" type="Label" parent="."]
-offset_left = 10.0
-offset_top = 10.0
-text = "WASD — ход, Shift — бег, Space — прыжок/подтянуть, ЛКМ — паутина, ПКМ — отпустить, R — респаун, Esc — мышь"
