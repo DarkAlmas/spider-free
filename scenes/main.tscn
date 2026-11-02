@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/player.gd" id="2"]
+
+[sub_resource type="CapsuleShape3D" id="c1"]
+[sub_resource type="StandardMaterial3D" id="mat1"]
+albedo_color = Color(0.1, 0.6, 0.55, 1)
+[sub_resource type="CapsuleMesh" id="m1"]
+material = SubResource("mat1")
+[sub_resource type="CylinderMesh" id="r1"]
+top_radius = 0.04
+bottom_radius = 0.04
+height = 1.0
+[sub_resource type="SphereShape3D" id="s1"]
+radius = 0.2
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+script = ExtResource("2")
+
+[node name="Col" type="CollisionShape3D" parent="Player"]
+shape = SubResource("c1")
+
+[node name="Body" type="MeshInstance3D" parent="Player"]
+mesh = SubResource("m1")
+
+[node name="Pivot" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="Player/Pivot"]
+shape = SubResource("s1")
+spring_length = 6.0
+
+[node name="Camera3D" type="Camera3D" parent="Player/Pivot/SpringArm3D"]
+
+[node name="Rope" type="MeshInstance3D" parent="Player"]
+mesh = SubResource("r1")
+
+[node name="Hint" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 10.0
+text = "WASD — ход, Shift — бег, Space — прыжок/подтянуть, ЛКМ — паутина, ПКМ — отпустить, R — респаун, Esc — мышь"
